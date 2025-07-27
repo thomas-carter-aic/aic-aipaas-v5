@@ -1,1 +1,95 @@
+# .gitignore for aic-aipaas
+
+# General
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+.DS_Store
+
+# Environment files
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Java
+target/
+*.class
+*.jar
+*.war
+*.ear
+.mvn/
+mvnw
+mvnw.cmd
+.mvn/wrapper/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+.pytest_cache/
+.coverage
+coverage.xml
+*.egg-info/
+.venv/
+venv/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+bin/
+vendor/
+
+# Rust
+target/
+Cargo.lock
+
+# Node.js/TypeScript
+node_modules/
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+
+# Docker
+docker-compose.override.yml
+*.dockerignore
+
+# Bazel
+bazel-*
+bazel-bin/
+bazel-out/
+bazel-testlogs/
+bazel-workspace/
+
+# Infrastructure
+/infrastructure/docker/volumes/
+/infrastructure/k8s/kubeconfig
+/infrastructure/terraform/terraform.tfstate
+/infrastructure/terraform/terraform.tfstate.backup
+/infrastructure/terraform/.terraform/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# Testing
+coverage/
+junit.xml
+test-results/
+
+# Miscellaneous
+*.bak
+*.swp
+*.swo
+*.cache
