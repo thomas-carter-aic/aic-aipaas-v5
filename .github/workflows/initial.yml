@@ -1,0 +1,59 @@
+name: Initial CI Workflow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Bazel
+        run: |
+          curl -fsSL https://bazel.build/install | bash
+          bazel --version
+
+      - name: Build Monorepo
+        run: bazel build //...
+
+      - name: Run Tests
+        run: bazel test //...
+
+      - name: Lint Code
+        run: |
+          # Lint TypeScript/Node.js (ESLint)
+          if [ -d "apps/microfrontends/shell" ]; then
+            cd apps/microfrontends/shell
+            npm install
+            npx eslint .
+          fi
+          # Lint Python (Flake8)
+          if [ -d "apps/services/inference-service" ]; then
+            cd apps/services/inference-service
+            pip install flake8
+            flake8 .
+          fi
+          # Lint Go (golangci-lint)
+          if [ -d "apps/services/data-service" ]; then
+            cd apps/services/data-service
+            curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.54.2
+            golangci-lint run
+          fi
+          # Lint Rust (Clippy)
+          if [ -d "apps/services/orchestration-service" ]; then
+            cd apps/services/orchestration-service
+            rustup component add clippy
+            cargo clippy --all-targets -- -D warnings
+          fi
+          # Lint Java (Checkstyle)
+          if [ -d "apps/services/model-service" ]; then
+            cd apps/services/model-service
+            mvn install checkstyle:check
+          fi
