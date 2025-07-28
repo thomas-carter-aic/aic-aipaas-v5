@@ -1,0 +1,19 @@
+linters:
+  enable:
+    - gofmt
+    - golint
+    - vet
+    - staticcheck
+    - unused
+  disable:
+    - errcheck
+linters-settings:
+  gofmt:
+    simplify: true
+  golint:
+    min-confidence: 0.8
+run:
+  timeout: 5m
+  modules-download-mode: readonly
+output:
+  format: colored-line-number

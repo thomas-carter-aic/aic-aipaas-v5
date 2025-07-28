@@ -1,0 +1,58 @@
+load("@rules_java//java:defs.bzl", "java_library", "java_binary")
+load("@rules_python//python:defs.bzl", "py_library", "py_binary")
+load("@rules_go//go:defs.bzl", "go_library", "go_binary")
+load("@rules_rust//rust:defs.bzl", "rust_library", "rust_binary")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_project")
+load("@aspect_rules_js//js:defs.bzl", "js_library", "js_run_binary")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@rules_grpc//grpc:defs.bzl", "grpc_proto_library")
+
+# Root-level build rules for the aic-aipaas monorepo
+# This file defines workspace-wide configurations, visibility, and top-level targets.
+# Specific service builds are in /apps/services/*/BUILD.bazel
+
+# Workspace-wide visibility
+package(default_visibility = ["//visibility:public"])
+
+# Link all npm packages for TypeScript/Node.js services and MFEs
+npm_link_all_packages(name = "node_modules")
+
+# Example top-level target: Build all services and MFEs
+all_services = glob(["apps/services/**/BUILD.bazel"])
+all_mfes = glob(["apps/microfrontends/**/BUILD.bazel"])
+
+genrule(
+    name = "build_all",
+    srcs = all_services + all_mfes,
+    outs = ["build_all.txt"],
+    cmd = "echo 'Built all services and MFEs' > $@",
+)
+
+# Proto libraries for gRPC (shared across services)
+proto_library(
+    name = "protos",
+    srcs = glob(["packages/protos/*.proto"]),
+)
+
+grpc_proto_library(
+    name = "grpc_protos",
+    protos = [":protos"],
+)
+
+# TS project for shared frontend components (if applicable)
+ts_project(
+    name = "shared_frontend",
+    srcs = glob(["packages/libs/ts/shared_frontend/*.ts"]),
+    deps = [
+        "@node_modules//react",
+        "@node_modules//@types/react",
+    ],
+    tsconfig = "//:tsconfig.json",
+)
+
+# Recommendations for extension:
+# - Add Bazel caching with remote execution for faster builds.
+# - Integrate with CI/CD: Use bazel-remote for cache sharing in GitHub Actions.
+# - For blockchain (Hyperledger Fabric): Add rules_go for chaincode builds in /packages/blockchain.
+# - For quantum (Qiskit): Add py_library for Qiskit utils in /packages/quantum/python.

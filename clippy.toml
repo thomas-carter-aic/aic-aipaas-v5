@@ -1,0 +1,4 @@
+# Clippy configuration for Rust
+allow-unused-imports = false
+pedantic = true
+max-line-length = 100

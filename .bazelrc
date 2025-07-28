@@ -1,0 +1,55 @@
+# .bazelrc for aic-aipaas monorepo
+# Configures Bazel for polyglot builds (Java, Python, Go, Rust, TypeScript),
+# CI/CD integration with GitHub Actions, and performance optimizations.
+
+# General build settings
+build --jobs=8  # Parallel builds with 8 jobs
+build --disk_cache=~/.bazel_cache  # Local disk caching for faster builds
+build --incompatible_strict_action_env=true  # Ensure reproducible builds
+
+# Test settings
+test --test_output=errors  # Show only errors in test output
+test --test_timeout=300  # 5-minute timeout per test
+
+# CI-specific configurations for GitHub Actions
+build:ci --remote_cache=https://cache.example.com  # Placeholder for remote cache
+build:ci --jobs=16  # More jobs for CI environment
+build:ci --build_tests_only=false  # Run all builds, not just tests
+
+# Language-specific toolchains
+# Java
+build --java_language_version=17
+build --tool_java_language_version=17
+build --java_runtime_version=17
+
+# Python
+build --python_version=3.11
+build --python_path=/usr/bin/python3
+
+# Go
+build --@rules_go//go:go_version=1.21.0
+
+# Rust
+build --@rules_rust//rust:toolchain=1.70.0
+build --@rules_rust//:rustfmt_tool=nightly-2023-09-01
+
+# TypeScript/Node.js
+build --@aspect_rules_ts//ts:tsconfig=//:tsconfig.json
+build --@aspect_rules_js//js:node_version=20.10.0
+
+# Linting configurations
+build --@rules_lint//lint:enable=eslint,flake8,golangcilint,clippy,checkstyle
+build --@rules_lint//lint:eslint_config=//:eslintrc
+build --@rules_lint//lint:flake8_config=//:flake8.ini
+build --@rules_lint//lint:golangcilint_config=//:golangci.yml
+build --@rules_lint//lint:clippy_config=//:clippy.toml
+build --@rules_lint//lint:checkstyle_config=//:checkstyle.xml
+
+# Enable gRPC for services
+build --@rules_grpc//grpc:enable=true
+
+# Recommendations for extension:
+# - Set up remote caching with a service like bazel-remote for CI.
+# - Add specific flags for blockchain (Hyperledger Fabric) and quantum (Qiskit) in Phase 3.
+# - Configure sandboxing for tests to prevent flakiness.
+# - Monitor build times and adjust --jobs based on CI runner specs.
